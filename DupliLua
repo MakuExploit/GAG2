@@ -1,0 +1,308 @@
+--// Visual Dupe Menu (GAG 2 Pet Duplicator - Final Header Fix)
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+
+-- GUI
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local DuplicateButton = Instance.new("TextButton")
+local CloseButton = Instance.new("TextButton")
+local UIStroke = Instance.new("UIStroke")
+local FrameCorner = Instance.new("UICorner")
+local LoadingLabel = Instance.new("TextLabel")
+local Credit = Instance.new("TextLabel")
+
+
+ScreenGui.Name = "VisualDupeGUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
+
+
+-- Main Frame
+Frame.Name = "Main"
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Frame.BackgroundTransparency = 0.05
+Frame.Position = UDim2.new(0.35,0,0.35,0)
+Frame.Size = UDim2.new(0,280,0,155)
+Frame.Active = true
+Frame.Draggable = true
+
+
+-- Red Glow Border
+UIStroke.Parent = Frame
+UIStroke.Thickness = 3
+UIStroke.Color = Color3.fromRGB(255,0,0)
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+
+FrameCorner.CornerRadius = UDim.new(0,15)
+FrameCorner.Parent = Frame
+
+
+
+-- Title FIXED
+Title.Name = "Title"
+Title.Parent = Frame
+Title.BackgroundTransparency = 1
+Title.BorderSizePixel = 0
+Title.Size = UDim2.new(1,-45,0,40)
+Title.Position = UDim2.new(0,0,0,0)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "GAG 2 Pet Duplicator"
+Title.TextColor3 = Color3.fromRGB(255,255,255)
+Title.TextSize = 14
+Title.TextScaled = true
+Title.TextWrapped = true
+Title.TextXAlignment = Enum.TextXAlignment.Center
+
+
+
+-- Duplicate Button
+DuplicateButton.Name = "Duplicate"
+DuplicateButton.Parent = Frame
+DuplicateButton.BackgroundColor3 = Color3.fromRGB(180,0,0)
+DuplicateButton.BorderSizePixel = 0
+DuplicateButton.Position = UDim2.new(0.1,0,0.35,0)
+DuplicateButton.Size = UDim2.new(0.8,0,0,40)
+DuplicateButton.Font = Enum.Font.GothamBold
+DuplicateButton.Text = "Duplicate"
+DuplicateButton.TextColor3 = Color3.fromRGB(255,255,255)
+DuplicateButton.TextSize = 18
+DuplicateButton.AutoButtonColor = true
+
+
+local duplicateCorner = Instance.new("UICorner")
+duplicateCorner.Parent = DuplicateButton
+duplicateCorner.CornerRadius = UDim.new(0,10)
+
+
+
+-- Loading Label
+LoadingLabel.Name = "LoadingLabel"
+LoadingLabel.Parent = Frame
+LoadingLabel.BackgroundTransparency = 1
+LoadingLabel.Size = UDim2.new(0.8,0,0,20)
+LoadingLabel.Position = UDim2.new(0.1,0,0.35,-22)
+LoadingLabel.Font = Enum.Font.GothamBold
+LoadingLabel.TextColor3 = Color3.fromRGB(255,255,255)
+LoadingLabel.TextSize = 16
+LoadingLabel.TextScaled = true
+LoadingLabel.Text = ""
+
+
+
+-- Credit
+Credit.Name = "Credit"
+Credit.Parent = Frame
+Credit.BackgroundTransparency = 1
+Credit.Position = UDim2.new(0.1,0,0.7,0)
+Credit.Size = UDim2.new(0.8,0,0,20)
+Credit.Font = Enum.Font.GothamBold
+Credit.Text = "Made by MakuScripts"
+Credit.TextColor3 = Color3.fromRGB(255,255,255)
+Credit.TextSize = 12
+
+
+
+-- Close Button
+CloseButton.Name = "Close"
+CloseButton.Parent = Frame
+CloseButton.BackgroundColor3 = Color3.fromRGB(60,0,0)
+CloseButton.Position = UDim2.new(1,-35,0,5)
+CloseButton.Size = UDim2.new(0,30,0,30)
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255,0,0)
+CloseButton.TextSize = 18
+-- Hover Effects
+local function addHoverEffect(button, normal, hover)
+
+	button.MouseEnter:Connect(function()
+		button.BackgroundColor3 = hover
+	end)
+
+	button.MouseLeave:Connect(function()
+		button.BackgroundColor3 = normal
+	end)
+
+end
+
+
+addHoverEffect(
+	DuplicateButton,
+	Color3.fromRGB(180,0,0),
+	Color3.fromRGB(220,0,0)
+)
+
+
+addHoverEffect(
+	CloseButton,
+	Color3.fromRGB(60,0,0),
+	Color3.fromRGB(150,0,0)
+)
+
+
+
+CloseButton.MouseButton1Click:Connect(function()
+	ScreenGui:Destroy()
+end)
+
+
+
+-- Logic
+local holding = nil
+local duplicateClone = nil
+local loading = false
+
+
+local function makeIndependentClone(tool)
+
+	local clone = tool:Clone()
+	clone.Name = tool.Name
+	clone:SetAttribute("FakeClone",true)
+
+	return clone
+
+end
+
+
+
+player.Character.ChildAdded:Connect(function(child)
+
+	if child:IsA("Tool") then
+		holding = child
+	end
+
+end)
+
+
+
+player.Character.ChildRemoved:Connect(function(child)
+
+	if child == holding then
+		holding = nil
+	end
+
+end)
+
+
+
+DuplicateButton.MouseButton1Click:Connect(function()
+
+	if loading or not holding then return end
+
+	loading = true
+	LoadingLabel.Text = "0%"
+
+
+	spawn(function()
+
+		local totalTime = math.random(15,20)
+		local stepTime = totalTime / 100
+
+
+		for i = 1,100 do
+
+			LoadingLabel.Text = i.."%"
+			wait(stepTime)
+
+		end
+
+
+		duplicateClone = makeIndependentClone(holding)
+
+		duplicateClone.Parent = player.Backpack
+
+
+		LoadingLabel.Text = "Done!"
+
+		wait(0.5)
+
+		LoadingLabel.Text = ""
+
+		loading = false
+
+	end)
+
+end)
+
+
+
+-- Drag System
+local dragToggle
+local dragInput
+local dragStart
+local startPos
+
+
+local function update(input)
+
+	local delta = input.Position - dragStart
+
+	Frame.Position =
+	UDim2.new(
+		startPos.X.Scale,
+		startPos.X.Offset + delta.X,
+		startPos.Y.Scale,
+		startPos.Y.Offset + delta.Y
+	)
+
+end
+
+
+
+Frame.InputBegan:Connect(function(input)
+
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+	or input.UserInputType == Enum.UserInputType.Touch then
+
+		dragToggle = true
+		dragStart = input.Position
+		startPos = Frame.Position
+
+
+		input.Changed:Connect(function()
+
+			if input.UserInputState == Enum.UserInputState.End then
+
+				dragToggle = false
+
+			end
+
+		end)
+
+	end
+
+end)
+
+
+
+Frame.InputChanged:Connect(function(input)
+
+	if input.UserInputType == Enum.UserInputType.MouseMovement
+	or input.UserInputType == Enum.UserInputType.Touch then
+
+		dragInput = input
+
+	end
+
+end)
+
+
+
+UserInputService.InputChanged:Connect(function(input)
+
+	if input == dragInput and dragToggle then
+
+		update(input)
+
+	end
+
+end)
